@@ -23,3 +23,10 @@ To reset the current integer:
 curl -X “PUT” https://restcounter.duckdns.org:5000/v1/current -H “Authorization: Bearer XXXXX”
 --data “current=1000”
 
+
+# Assumptions:
+
+The counter is an integer, and will start from 0.
+The state of the counter is persistent and consistent across all users.
+Any new user can register without restrictions, as long as they do not collide with an existing user's email.
+
