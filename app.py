@@ -1,12 +1,12 @@
 #!flask/bin/python
 from flask import Flask, jsonify, request, make_response, redirect, session, url_for, abort
 from oauth2client import client, crypt
-import datetime, uuid, jwt, json
+import datetime, uuid, jwt, json, pprint
 
 from dbController import insertUser, existUser, getPasswordHash
 from authenticator import encodeAuthToken, decodeAuthToken, hashPassword, verifyPassword
 from constants import EMAIL, PASSWORD, AUTHORIZATION, SECRET_KEY, \
-	TOKEN_VALID_TIME, CLIENT_ID, TOKEN_RESPONSE, ID_TOKEN
+	TOKEN_VALID_TIME, CLIENT_ID, TOKEN_RESPONSE, ID_TOKEN, CURRENT
 
 app = Flask(__name__)
 counter = 0
@@ -54,8 +54,11 @@ def authenticate():
 def current():
 	if _userAuthenticated():
 		global counter 
-		if request.method == 'PUT':
-			print request.json
+		if request.method == 'PUT' and CURRENT in request.form:
+			try:
+				counter = int(request.form[CURRENT])
+			except:
+				abort(400)
 		return _constructCounterResponse(counter)
 	else:
 		abort(401)
@@ -72,6 +75,11 @@ def next():
 @app.errorhandler(401)
 def custom_401(error):
 	return make_response(jsonify({'WWWAuthenticate':'Basic realm="Login Required"'}), 401)
+	
+@app.errorhandler(400)
+def custom_400(error):
+	return make_response(jsonify({'status': 'failed', \
+	'message': 'Bad Request.  PUT must contain an integer for \"current\".'}), 401)
 	
 def _constructCounterResponse(counter):
 	return make_response(jsonify({"data": { "type": "counter", "id": counter }}), 200)	
