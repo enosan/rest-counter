@@ -3,12 +3,12 @@ import datetime, jwt
 from passlib.hash import pbkdf2_sha256
 from constants import TOKEN_VALID_TIME, SECRET_KEY
 
-def encodeAuthToken(email, password):
+def encodeAuthToken(email):
     try:
         payload = {
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=TOKEN_VALID_TIME),
             'iat': datetime.datetime.utcnow(),
-            'sub': email + password
+            'sub': email
         }
         return jwt.encode(
             payload,
@@ -29,3 +29,6 @@ def decodeAuthToken(auth_token):
 
 def hashPassword(password):
 	return pbkdf2_sha256.hash(password)
+
+def verifyPassword(password, hash):
+	return pbkdf2_sha256.verify(password, hash)
