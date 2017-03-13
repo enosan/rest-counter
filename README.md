@@ -5,6 +5,24 @@ To use, the user must first authenticate with a POST request to https://restcoun
 
 { "email": "xxx@gmail.com", "password": "xxx" }
 
+An example using curl:
+
+curl -X "POST" https://restcounter.duckdns.org:5000/v1/authenticate -H "Content-Type: application/json" --insecure --data '{"email":"xxx@gmail.com","password":"xxx"}'
+
+This returns something like this:
+
+{
+  "data": {
+    "attributes": {
+      "access_token": "eyJhbR5cCI6IkpXVCJ9.eyJpYXQiOjE0ODk0MjYwMDQsInN1YiI6ImVub0BnbWFpbC5jb20iLCJleHAiOjE0ODk0Mjk2MDR9.7S4nyMG2TFadUOaUH4-iDuskhcnMvXgN7g4d_C7BJWc",
+      "expires_in": 3600,
+      "token_type": "Bearer"
+    },
+    "id": "Mon, 13 Mar 2017 17:26:44 GMT",
+    "type": "token"
+  }
+}
+
 The user may alternatively hit the same url in the browser, without a body, to authenticate through Google.  
 The response will contain a bearer token which contains the time to expiry.
 
