@@ -17,7 +17,6 @@ def authenticateWithGoogle():
 			scope='email',
 			redirect_uri=url_for('authenticate', _external=True))
 	if 'code' not in request.args:
-		print "19"
 		auth_uri = flow.step1_get_authorize_url()
 		return redirect(auth_uri)
 	else:
@@ -36,9 +35,7 @@ def authenticateWithGoogle():
 @app.route('/v1/authenticate', methods=['GET', 'POST'])
 def authenticate():
 	if request.method == 'POST' and request.json is not None and _validRequest(request.json):
-		print "33"
 		if existUser(request.json[EMAIL]):
-			print "35"
 			if verifyPassword(request.json[PASSWORD], getPasswordHash(request.json[EMAIL])):
 				return _constructTokenResponse(encodeAuthToken(request.json[EMAIL]), TOKEN_VALID_TIME)
 			else:
