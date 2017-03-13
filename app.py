@@ -1,7 +1,7 @@
 #!flask/bin/python
 from flask import Flask, jsonify, request, make_response, redirect, session, url_for, abort
 from oauth2client import client, crypt
-import datetime, uuid, jwt, json, pprint
+import datetime, uuid, jwt, json, pprint, ssl
 
 from dbController import insertUser, existUser, getPasswordHash
 from authenticator import encodeAuthToken, decodeAuthToken, hashPassword, verifyPassword
@@ -19,7 +19,7 @@ counter = 0
 
 def authenticateWithGoogle():	
 	flow = client.flow_from_clientsecrets(
-			'client_secrets.json',
+			'client_secrets_secure.json',
 			scope='email',
 			redirect_uri=url_for('authenticate', _external=True))
 	if 'code' not in request.args:
@@ -130,7 +130,9 @@ def _extractIdToken(data):
 	
 if __name__ == '__main__':
 	app.secret_key = SECRET_KEY
-	http_server = HTTPServer(WSGIContainer(app))
+	ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+	ssl_ctx.load_cert_chain("ca.cert.pem", "ca.key.pem")
+	http_server = HTTPServer(WSGIContainer(app), ssl_options=ssl_ctx)
 	http_server.listen(5000)
 	IOLoop.instance().start()
 	#app.run(host='0.0.0.0',debug=True)
