@@ -7,9 +7,15 @@ from dbController import insertUser, existUser, getPasswordHash
 from authenticator import encodeAuthToken, decodeAuthToken, hashPassword, verifyPassword
 from constants import EMAIL, PASSWORD, AUTHORIZATION, SECRET_KEY, \
 	TOKEN_VALID_TIME, CLIENT_ID, TOKEN_RESPONSE, ID_TOKEN, CURRENT
+	
+from tornado.wsgi import WSGIContainer
+from tornado.httpserver import HTTPServer
+from tornado.ioloop import IOLoop
 
 app = Flask(__name__)
 counter = 0
+
+
 
 def authenticateWithGoogle():	
 	flow = client.flow_from_clientsecrets(
@@ -44,7 +50,6 @@ def authenticate():
 			insertUser(request.json[EMAIL], hashPassword(request.json[PASSWORD]))
 			return _constructTokenResponse(encodeAuthToken(request.json[EMAIL]), TOKEN_VALID_TIME)
 	else:
-		print "44"
 		return authenticateWithGoogle()
 		
 @app.route('/v1/current', methods=['GET', 'PUT'])
@@ -125,5 +130,8 @@ def _extractIdToken(data):
 	
 if __name__ == '__main__':
 	app.secret_key = SECRET_KEY
-	app.run(host='0.0.0.0',debug=True)
+	http_server = HTTPServer(WSGIContainer(app))
+	http_server.listen(5000)
+	IOLoop.instance().start()
+	#app.run(host='0.0.0.0',debug=True)
 	
